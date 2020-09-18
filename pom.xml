@@ -58,6 +58,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <keycloak.version>11.0.2</keycloak.version>
@@ -87,15 +88,30 @@
 
         <!-- graalvm -->
         <native-image-plugin.version>20.2.0</native-image-plugin.version>
-        <spring.profiles.include/>
+        <spring.profiles.active/>
         <start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
     </properties>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.4.RELEASE</version>
+        <version>2.4.0-M3</version>
     </parent>
+
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestone</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <!-- Intellij friendly POM -->
     <dependencyManagement>
@@ -433,7 +449,7 @@
             <id>native</id>
             <properties>
                 <skipTests>true</skipTests>
-                <spring.profiles.include>native</spring.profiles.include>
+                <spring.profiles.active>native</spring.profiles.active>
             </properties>
             <dependencies>
                 <dependency>
@@ -478,9 +494,9 @@
                         <version>${native-image-plugin.version}</version>
                         <configuration>
                             <imageName>keycloak-config-cli-native</imageName>
-                            <buildArgs>--no-fallback --no-server
-                                --enable-http --enable-https
+                            <buildArgs>--enable-all-security-services
                                 --initialize-at-run-time=org.hibernate.validator.internal.engine.messageinterpolation.ElTermResolver
+                                -H:EnableURLProtocols=http,https
                                 -H:+ReportExceptionStackTraces
                                 -Dspring.native.dump-config=feature-reflect-config.json
                                 -Dspring.native.verify=true
@@ -490,6 +506,8 @@
                                 -Dspring.native.remove-spel-support=true
                                 -Dspring.native.remove-yaml-support=false
                                 -Dspring.native.remove-xml-support=false
+                                -Dspring.spel.ignore=true
+                                -Dspring.xml.ignore=true
                             </buildArgs>
                         </configuration>
                         <executions>
@@ -507,20 +525,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <repositories>
-                <repository>
-                    <id>spring-milestones</id>
-                    <name>Spring Milestones</name>
-                    <url>https://repo.spring.io/milestone</url>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>spring-milestone</id>
-                    <name>Spring Milestones</name>
-                    <url>https://repo.spring.io/milestone</url>
-                </pluginRepository>
-            </pluginRepositories>
         </profile>
         <profile>
             <id>coverage</id>
